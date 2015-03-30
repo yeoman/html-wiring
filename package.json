@@ -1,7 +1,7 @@
 {
   "name": "html-wiring",
   "version": "0.0.0",
-  "description": "",
+  "description": "Set of utilities to update HTML files",
   "license": "MIT",
   "keywords": [
     "html",

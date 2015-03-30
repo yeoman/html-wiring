@@ -4,7 +4,7 @@
 var path = require('path');
 var fs = require('fs');
 var assert = require('yeoman-assert');
-var wiring = require('../lib');
+var wiring = require('..');
 
 
 describe('generators.Base (actions/wiring)', function () {

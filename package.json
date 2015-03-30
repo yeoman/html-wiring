@@ -16,7 +16,7 @@
     "prepublish": "nsp audit-package"
   },
   "files": [
-    "lib"
+    "index.js"
   ],
   "dependencies": {
     "cheerio": "^0.19.0"

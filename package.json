@@ -1,0 +1,28 @@
+{
+  "name": "html-wiring",
+  "version": "0.0.0",
+  "description": "",
+  "license": "MIT",
+  "keywords": [
+    "html",
+    "dom",
+    "wiring",
+    "cheerio"
+  ],
+  "author": "The Yeoman Team",
+  "repository": "yeoman/html-wiring",
+  "scripts": {
+    "test": "mocha",
+    "prepublish": "nsp audit-package"
+  },
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "cheerio": "^0.19.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "yeoman-assert": "^1.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-/*global describe, before, it */
+/*global describe, before, beforeEach, afterEach, it */
 'use strict';
 
 var path = require('path');
@@ -18,7 +18,7 @@ describe('generators.Base (actions/wiring)', function () {
       'path/file2.js'
     ]);
 
-    assert.equal(res.trim(), '<!-- build:js main.js -->\npath/file1.js,path/file2.js        <!-- endbuild -->');
+    assert.equal(res.trim(), '<!-- build:js main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
 
   it('generate a simple block with search path', function () {
@@ -27,7 +27,7 @@ describe('generators.Base (actions/wiring)', function () {
       'path/file2.js'
     ], '.tmp/');
 
-    assert.equal(res.trim(), '<!-- build:js(.tmp/) main.js -->\npath/file1.js,path/file2.js        <!-- endbuild -->');
+    assert.equal(res.trim(), '<!-- build:js(.tmp/) main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
 
   it('generate block with multiple search paths', function () {
@@ -36,7 +36,7 @@ describe('generators.Base (actions/wiring)', function () {
       'path/file2.js'
     ], ['.tmp/', 'dist/']);
 
-    assert.equal(res.trim(), '<!-- build:js({.tmp/,dist/}) main.js -->\npath/file1.js,path/file2.js        <!-- endbuild -->');
+    assert.equal(res.trim(), '<!-- build:js({.tmp/,dist/}) main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
 
   it('append js files to an html string', function () {
@@ -221,6 +221,37 @@ describe('generators.Base (actions/wiring)', function () {
       var fixture = fs.readFileSync(path.join(this.fixtures, 'css_block_dir.html'), 'utf-8').trim();
 
       assert.textEqual(res, fixture);
+    });
+  });
+
+  describe('change indent to 4 spaces', function () {
+    beforeEach(function () {
+      this.originalIndent = wiring.defaults.indent;
+      wiring.defaults.indent = '        ';
+    });
+
+    afterEach(function () {
+      wiring.defaults.indent = this.originalIndent;
+    });
+
+    describe('#appendScriptsDir()', function () {
+      it('append scripts directory', function () {
+        var html = '<html><body></body></html>';
+        var res = wiring.appendScriptsDir(html, 'out/file.js', path.join(__dirname, 'fixtures/dir-fixtures'));
+        var fixture = fs.readFileSync(path.join(this.fixtures, 'js_block_dir_indent_4.html'), 'utf-8').trim();
+
+        assert.textEqual(res, fixture);
+      });
+    });
+
+    describe('#appendStylesDir()', function () {
+      it('append styles directory', function () {
+        var html = '<html><head></head></html>';
+        var res = wiring.appendStylesDir(html, 'out/file.css', path.join(__dirname, 'fixtures/dir-css-fixtures'));
+        var fixture = fs.readFileSync(path.join(this.fixtures, 'css_block_dir_indent_4.html'), 'utf-8').trim();
+
+        assert.textEqual(res, fixture);
+      });
     });
   });
 });

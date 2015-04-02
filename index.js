@@ -124,8 +124,8 @@ wiring.generateBlock = function generateBlock(blockType, optimizedPath, filesBlo
     blockSearchPath = '(' + searchPath + ')';
   }
 
-  blockStart = '\n        <!-- build:' + blockType + blockSearchPath + ' ' + optimizedPath + ' -->\n';
-  blockEnd = '        <!-- endbuild -->\n';
+  blockStart = '\n' + wiring.appendIndent('<!-- build:' + blockType + blockSearchPath + ' ' + optimizedPath + ' -->\n');
+  blockEnd = wiring.appendIndent('<!-- endbuild -->\n');
   return blockStart + filesBlock + blockEnd;
 };
 
@@ -161,13 +161,13 @@ wiring.appendFiles = function appendFiles(htmlOrOptions, fileType, optimizedPath
 
   if (fileType === 'js') {
     sourceFileList.forEach(function (el) {
-      files += '        <script ' + attrs + ' src="' + el + '"></script>\n';
+      files += wiring.appendIndent('<script ' + attrs + ' src="' + el + '"></script>\n');
     });
     blocks = this.generateBlock('js', optimizedPath, files, searchPath);
     updatedContent = this.append(html, 'body', blocks);
   } else if (fileType === 'css') {
     sourceFileList.forEach(function (el) {
-      files += '        <link ' + attrs + ' rel="stylesheet" href="' + el + '">\n';
+      files += wiring.appendIndent('<link ' + attrs + ' rel="stylesheet" href="' + el + '">\n');
     });
     blocks = this.generateBlock('css', optimizedPath, files, searchPath);
     updatedContent = this.append(html, 'head', blocks);
@@ -286,4 +286,19 @@ wiring.readFileAsString = function readFileAsString(filePath) {
 
 wiring.writeFileFromString = function writeFileFromString(html, filePath) {
   fs.writeFileSync(path.resolve(filePath), html, 'utf8');
+};
+
+/**
+ * Append the indent of a string to a line text.
+ *
+ * @param {String} line line text
+ * @return {String} indented line text
+ */
+
+wiring.appendIndent = function (line) {
+  return wiring.defaults.indent + line;
+};
+
+wiring.defaults = {
+  indent: '    '
 };

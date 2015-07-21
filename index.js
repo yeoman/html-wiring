@@ -3,6 +3,7 @@ var util = require('util');
 var fs = require('fs');
 var path = require('path');
 var cheerio = require('cheerio');
+var detectNewline = require('detect-newline');
 
 /**
  * @mixin
@@ -112,7 +113,7 @@ wiring.prependToFile = function prependToFile(path, tagName, content) {
  * @param {String|Array} searchPath
  */
 
-wiring.generateBlock = function generateBlock(blockType, optimizedPath, filesBlock, searchPath) {
+wiring.generateBlock = function generateBlock(blockType, optimizedPath, filesBlock, searchPath, eolChar) {
   var blockStart;
   var blockEnd;
   var blockSearchPath = '';
@@ -124,8 +125,8 @@ wiring.generateBlock = function generateBlock(blockType, optimizedPath, filesBlo
     blockSearchPath = '(' + searchPath + ')';
   }
 
-  blockStart = '\n' + wiring.appendIndent('<!-- build:' + blockType + blockSearchPath + ' ' + optimizedPath + ' -->\n');
-  blockEnd = wiring.appendIndent('<!-- endbuild -->\n');
+  blockStart = eolChar + wiring.appendIndent('<!-- build:' + blockType + blockSearchPath + ' ' + optimizedPath + ' -->' + eolChar);
+  blockEnd = wiring.appendIndent('<!-- endbuild -->' + eolChar);
   return blockStart + filesBlock + blockEnd;
 };
 
@@ -147,6 +148,7 @@ wiring.appendFiles = function appendFiles(htmlOrOptions, fileType, optimizedPath
   var updatedContent;
   var html = htmlOrOptions;
   var files = '';
+  var eolChar;
 
   if (typeof htmlOrOptions === 'object') {
     html = htmlOrOptions.html;
@@ -159,17 +161,19 @@ wiring.appendFiles = function appendFiles(htmlOrOptions, fileType, optimizedPath
 
   attrs = this.attributes(attrs);
 
+  eolChar = detectNewline(html);
+
   if (fileType === 'js') {
     sourceFileList.forEach(function (el) {
-      files += wiring.appendIndent('<script ' + attrs + ' src="' + el + '"></script>\n');
+      files += wiring.appendIndent('<script ' + attrs + ' src="' + el + '"></script>' + eolChar);
     });
-    blocks = this.generateBlock('js', optimizedPath, files, searchPath);
+    blocks = this.generateBlock('js', optimizedPath, files, searchPath, eolChar);
     updatedContent = this.append(html, 'body', blocks);
   } else if (fileType === 'css') {
     sourceFileList.forEach(function (el) {
-      files += wiring.appendIndent('<link ' + attrs + ' rel="stylesheet" href="' + el + '">\n');
+      files += wiring.appendIndent('<link ' + attrs + ' rel="stylesheet" href="' + el + '">' + eolChar);
     });
-    blocks = this.generateBlock('css', optimizedPath, files, searchPath);
+    blocks = this.generateBlock('css', optimizedPath, files, searchPath, eolChar);
     updatedContent = this.append(html, 'head', blocks);
   }
 

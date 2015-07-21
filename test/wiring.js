@@ -16,7 +16,7 @@ describe('generators.Base (actions/wiring)', function () {
     var res = wiring.generateBlock('js', 'main.js', [
       'path/file1.js',
       'path/file2.js'
-    ]);
+    ], undefined, '\n');
 
     assert.equal(res.trim(), '<!-- build:js main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
@@ -25,7 +25,7 @@ describe('generators.Base (actions/wiring)', function () {
     var res = wiring.generateBlock('js', 'main.js', [
       'path/file1.js',
       'path/file2.js'
-    ], '.tmp/');
+    ], '.tmp/', '\n');
 
     assert.equal(res.trim(), '<!-- build:js(.tmp/) main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
@@ -34,7 +34,7 @@ describe('generators.Base (actions/wiring)', function () {
     var res = wiring.generateBlock('js', 'main.js', [
       'path/file1.js',
       'path/file2.js'
-    ], ['.tmp/', 'dist/']);
+    ], ['.tmp/', 'dist/'], '\n');
 
     assert.equal(res.trim(), '<!-- build:js({.tmp/,dist/}) main.js -->\npath/file1.js,path/file2.js    <!-- endbuild -->');
   });
@@ -43,9 +43,45 @@ describe('generators.Base (actions/wiring)', function () {
     var html = '<html><body></body></html>';
     var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
     var fixture = fs.readFileSync(path.join(this.fixtures, 'js_block.html'),
-                                  'utf-8').trim();
+      'utf-8').trim();
 
     assert.textEqual(res, fixture);
+  });
+
+  it('append js files to an html with Windows EOL', function () {
+    var html = '<html><body></body></html>\r\n';
+    var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
+    var expected = '<html><body>\r\n' +
+      '    <!-- build:js out/file.js -->\r\n' +
+      '    <script src="in/file1.js"></script>\r\n' +
+      '    <script src="in/file2.js"></script>\r\n' +
+      '    <!-- endbuild -->\r\n' +
+      '</body></html>\r\n';
+
+    assert.equal(res, expected);
+  });
+
+  it('append js files to an html with Unix EOL', function () {
+    var html = '<html><body></body></html>\n';
+    var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
+    var expected = '<html><body>\n' +
+      '    <!-- build:js out/file.js -->\n' +
+      '    <script src="in/file1.js"></script>\n' +
+      '    <script src="in/file2.js"></script>\n' +
+      '    <!-- endbuild -->\n' +
+      '</body></html>\n';
+
+    assert.equal(res, expected);
+  });
+
+  it('append js files to an html file', function () {
+    var html = fs.readFileSync(path.join(this.fixtures, 'basic_html.html'),
+      'utf-8');
+    var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
+    var fixture = fs.readFileSync(path.join(this.fixtures, 'js_block.html'),
+      'utf-8');
+
+    assert.equal(res, fixture);
   });
 
   it('appendFiles work the same using the object syntax', function () {

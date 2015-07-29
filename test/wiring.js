@@ -74,16 +74,6 @@ describe('generators.Base (actions/wiring)', function () {
     assert.equal(res, expected);
   });
 
-  it('append js files to an html file', function () {
-    var html = fs.readFileSync(path.join(this.fixtures, 'basic_html.html'),
-      'utf-8');
-    var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
-    var fixture = fs.readFileSync(path.join(this.fixtures, 'js_block.html'),
-      'utf-8');
-
-    assert.equal(res, fixture);
-  });
-
   it('appendFiles work the same using the object syntax', function () {
     var html = '<html><body></body></html>';
     var res = wiring.appendFiles(html, 'js', 'out/file.js', ['in/file1.js', 'in/file2.js']);
